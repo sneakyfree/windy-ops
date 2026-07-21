@@ -44,5 +44,9 @@ Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3
 ## KNOWN PRE-EXISTING FAILURES (not caused by this era's work)
 - **windy-mail** `tests/test_wave2_contracts.py::test_archive_runs_and_records_cloud_archive_id` — fails on clean `main` (verified 2026-07-21 by running it on an untouched checkout). Result: `{'archived': 0, 'failed': 1}` — the archive→Windy Cloud upload path errors under the fake transport. Triage before mail is declared launch-ready; it may indicate a real archive-to-Cloud break, which would matter for retention.
 
+## AGENT (windy-agent) PRE-EXISTING FAILURES — triage before launch-ready
+- `test_sd_notify` ×2: `AF_UNIX path too long` — macOS tmpdir exceeds the UNIX socket path limit. Environmental; fix = bind under a short /tmp dir.
+- `test_phone_provision::TestMockProvisioning` ×2: expects `is_mock=True`, gets `False`. **Possibly real** — mock mode not engaging could mean a dev/test run attempts LIVE Twilio provisioning. Root-cause before dismissing.
+
 ## BLOCKED-AND-LOGGED
 - CI green checkbox in EVERY repo checklist: blocked on GitHub billing (see Phase 2). Repos can complete all other boxes; CI box inherits unblock automatically when billing lands.
