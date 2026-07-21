@@ -8,6 +8,11 @@ Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3
 - **DNS truths learned:** api.windymind/clone/drops/search/mail/call/cell/text + cloud.windycloud.com all → Kit 0. Legacy `windypro.thewindstorm.uk` = a Cloudflare TUNNEL (cfargotunnel) still fronting api.windyfly.ai, api.windychat.ai, api.windycode.org, push.windychat.ai, updates.windycode.org. SPAs on CF Pages (app.windyword/chat/mail). Stragglers: api.nachocrunch.org→3.85.96.56 (AWS, non-Windy), cloud.windyword.ai→32.193.70.195 (stale?). Hostinger WEEKLY auto-backups exist (07-13, 07-20) + my snapshot. NOTE: its deploy target is now Kit 0 (not AWS) — all deploy/runbook work must respect look-don't-touch + announce-first.
 - **Next terminal-script batch (queue for when Grant's hands are needed anyway):** Cloudflare API read-only DNS export (reveal proxied origins), Hostinger `GET /backups` (does Kit 0 have durable auto-backups beyond the 24h snapshot?), AWS zombie-instance audit, push pending windy-ops commits.
 
+## ETERNITAS CHECKLIST STATE (07-21 morning)
+- [x] builds clean (fresh uv sync, twice, Mac) · [x] tests pass (784/0 fail, suite green on stacked branches) · [x] no secrets in code · [x] error handling pass (PR #125) · [ ] runbook (branch 3 — staged, needs kit0-verify TBCs) · [x] DNS/SSL verified (api.eternitas.ai → Kit 0, unproxied, live) · [ ] smoke test doc (staged, lands with branch 3) · [x] README adequate · [ ] principles pass (do at close)
+- PRs OPEN: #125 (silent-failures, LOW), #126 (bcrypt rounds, LOW, base=#125; body corrected for honest speed claim via batch5)
+- Suite truth: 45 min even with fast bcrypt — real sink = 34 deny-listed xfail tests each burning a timeout + rate-limit waits. PR-04 candidate: deny-list → skip (saves ~15-20 min/run; they've failed 30+ commits; issue #33). Add --durations=20 to future runs.
+
 ## PHASE 2 RESULTS (2026-07-21)
 | Item | State |
 |---|---|
