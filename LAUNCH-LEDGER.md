@@ -29,11 +29,17 @@ Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3
 | AWS zombie audit | ⬜ NEW — EC2s/RDS may still be billing Grant post-migration |
 
 ## PHASE 3 RANKED LIST (state: ⬜ not started unless noted)
-1. eternitas ✅ MERGED ×3 (main=cf8ff6f) — LAUNCH-READY; prod deploy to Kit 0 pending Grant's yes; CI box blocked-and-logged; follow-ups: PR-04 xfail→skip, deploy-prod retire, compose rename Grant-gated) · 2. windy-mind ✅ MERGED ×2 (main=ead8073) — checklist complete pending principles-pass note + prod deploy · 3. windy-pro/account-server ⏸️ FROZEN (sibling-Fable consolidation on Windy 0; trust-critical cascade gap found + fix staged in handoff-account-server-cascade.patch + HANDOFF-windy-pro-findings.md) · 4. windy-mail ⬜ · 5. windy-agent ⬜ · 6. windy-connect ⬜ · 7. windy-registry ⬜ · 8. windy-drops ⬜ · 9. windy-admin ⬜ → CONCERT PASS 1 ⬜
+1. eternitas ✅✅ LAUNCH-READY + DEPLOYED to Kit 0 (cf8ff6f, health 200, alembic ran, 2026-07-21 15:02 UTC); CI box blocked-and-logged; follow-ups: PR-04 xfail→skip, deploy-prod retire, compose rename Grant-gated) · 2. windy-mind ✅✅ LAUNCH-READY + DEPLOYED to Kit 0 (ead8073, loopback+MESH both 200, /version stamps the SHA — deploy identity works here, 15:12 UTC) · 3. windy-pro/account-server ⏸️ FROZEN (sibling-Fable consolidation on Windy 0; trust-critical cascade gap found + fix staged in handoff-account-server-cascade.patch + HANDOFF-windy-pro-findings.md) · 4. windy-mail ⬜ · 5. windy-agent ⬜ · 6. windy-connect ⬜ · 7. windy-registry ⬜ · 8. windy-drops ⬜ · 9. windy-admin ⬜ → CONCERT PASS 1 ⬜
 10. windy-chat ⬜ · 11. WindyCloud ⬜ · 12. windy-cloud-sites ⬜ · 13. windy-cloud-domains ⬜ · 14. windy-search ⬜ · 15. Windy-Clone ⬜ → CONCERT PASS 2 ⬜
 16. windytalk ⬜ · 17. windy-stt ⬜ · 18. windy-cell ⬜ · 19. windy-call ⬜ · 20. windy-text ⬜ · 21. windy-whatsapp-gateway ⬜ · 22. windy-code ⬜ · 23. windy-code-web ⬜ · 24. windy-pro-mobile ⏸️ FROZEN (Word consolidation) → CONCERT PASS 3 ⬜
 25. control-panel/word-mcp/fix-me ⬜ · 26. windy-calendar ⬜ · 27. windy-iron ⬜ · 28. windy-ads ⬜ (scope decision first) · 29. sites (each after its product) ⬜ → FINAL CONCERT PASS ⬜
 30. Tier D: parked permanently this era.
+
+## DEPLOY LOG (rollback points — check here first in an incident)
+| When (UTC) | Service | From SHA | To SHA | Result |
+|---|---|---|---|---|
+| 2026-07-21 15:02 | eternitas (Kit 0, project eternitas-dev) | 30aed34 | cf8ff6f | OK, health 200 |
+| 2026-07-21 15:11 | windy-mind (Kit 0, project windymind-dev) | c5a3f87 | ead8073 | OK, loopback+mesh 200 |
 
 ## BLOCKED-AND-LOGGED
 - CI green checkbox in EVERY repo checklist: blocked on GitHub billing (see Phase 2). Repos can complete all other boxes; CI box inherits unblock automatically when billing lands.
