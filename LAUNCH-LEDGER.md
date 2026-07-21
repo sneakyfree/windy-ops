@@ -10,7 +10,10 @@ Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3
 
 ## ETERNITAS CHECKLIST STATE (07-21 morning)
 - [x] builds clean (fresh uv sync, twice, Mac) · [x] tests pass (784/0 fail, suite green on stacked branches) · [x] no secrets in code · [x] error handling pass (PR #125) · [ ] runbook (branch 3 — staged, needs kit0-verify TBCs) · [x] DNS/SSL verified (api.eternitas.ai → Kit 0, unproxied, live) · [ ] smoke test doc (staged, lands with branch 3) · [x] README adequate · [ ] principles pass (do at close)
-- PRs OPEN: #125 (silent-failures, LOW), #126 (bcrypt rounds, LOW, base=#125; body corrected for honest speed claim via batch5)
+- PRs OPEN: #125 (silent-failures, LOW), #126 (bcrypt rounds, LOW, base=#125, body corrected), branch 3 `harden/eternitas-03-deploy-truth` committed (34f38ce) — publishes via batch6 as PR (deploy-truth docs, LOW). Drift-lint verified passing locally.
+- windy-mind PR #73 OPEN (CI test job, LOW). Mind suite: 483 passed in 7.62s locally — cleanest foundation.
+- AWS ZOMBIE AUDIT CLOSED: daily cost $6.91 (07-14) → $0.04/day now; bleed stopped at migration; ~$1/mo residue. No action needed. July's $121 was pre-migration usage.
+- Eternitas remaining after PR merges: principles-pass (last checklist box) + deny-list-xfail→skip PR (PR-04, saves ~15-20 min/suite) + deploy-prod/ retire-or-repurpose follow-up (logged in SUBSTRATE).
 - Suite truth: 45 min even with fast bcrypt — real sink = 34 deny-listed xfail tests each burning a timeout + rate-limit waits. PR-04 candidate: deny-list → skip (saves ~15-20 min/run; they've failed 30+ commits; issue #33). Add --durations=20 to future runs.
 
 ## PHASE 2 RESULTS (2026-07-21)
