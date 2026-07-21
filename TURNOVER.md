@@ -4,9 +4,11 @@
 
 You are Fable, CTO of Windy, working in Cowork on Grant's Mac mini. Grant is non-technical; never ask him technical questions; one step at a time when you need his hands. The Seven Principles (kit-army-config/doctrine/00-SEVEN-GUIDING-PRINCIPLES.md) decide everything — read them first, they're 24 lines.
 
-**Where I stopped, mid-thought:**
-Phases 1–2 done. Migration to Kit 0 CONFIRMED (see ledger); SOTU corrected; snapshot taken (24h expiry — re-take before merge eras via Hostinger API script); windy-ops live on GitHub (local commits may be ahead — push rides the next Grant-paste script, see ledger IN FLIGHT for the queued script contents).
-NOW: Phase 3 repo #1 **eternitas** — began with a repo deep-dive (build, tests, secrets scan, error handling, runbook state vs its NEW Kit 0 home). Work pattern: branch + PR per fix, risk labels, plain-English 3-sentence summaries. PRs push via Grant-paste script batches.
+**Where I stopped (end of night shift, ~02:00 ET 2026-07-21):**
+Overnight state: eternitas suite was running Mac-side on branch `harden/eternitas-01-silent-failures` via batch3b (glacial — bcrypt+rate-limit waits; possibly hung on a network test). It may have finished and auto-opened PR-01, or not — CHECK `~/windy/.fable/batch3b.log` + `eternitas-prs.txt` FIRST.
+Ready and waiting: branch-02 patch at `.fable/patch-eternitas-02-bcrypt.patch` (bcrypt rounds configurable, tests fast) + PR bodies in `.fable/prs/` + `fable-batch4.sh` (morning script, defensive: fast reads first — kit0 inspect, AWS zombies, fresh snapshot — then kills stale pytest, builds validate/stack-01-02, runs now-fast suite, pushes both branches, opens both PRs, pushes windy-ops).
+MORNING FLOW: Grant pastes `bash ~/windy/fable-batch4.sh` → read `.fable/` results → write eternitas deploy-truth PR (branch 3: SUBSTRATE/DEPLOY rewrite for Kit 0 + rollback runbook + smoke test from `.fable/staged-eternitas-SMOKE-TEST.md`, fed by kit0-inspect.txt) → close eternitas checklist → repo #2 windy-mind (recon DONE, see RECON.md — first PRs: add pytest job to CI; deploy-truth).
+Recon complete for repos #2/#3/#4 (RECON.md). Key morning reads: aws-instances.txt + aws-cost.json (zombie report for Grant), kit0-inspect.txt (runbook facts). Remember: windy-mail's "JMAP send broken" lockbox note is probably STALE — verify live, then correct the lockbox via branch+PR (allowed for cred/machine updates? NO — lockbox edits are cred-only; put the correction in windy-ops + tell Grant instead).
 
 **Environment facts you'd otherwise re-derive painfully:**
 - Sandbox network = github.com git-HTTPS only. NOTHING else resolves. No gh (api.github.com blocked), no SSH/ping anywhere, no cloud APIs.
