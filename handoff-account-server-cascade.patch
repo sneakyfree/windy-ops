@@ -1,0 +1,295 @@
+--- /tmp/asm-pristine/src/routes/webhooks-eternitas.ts	2026-07-21 10:39:01.706934405 -0400
++++ account-server-main/src/routes/webhooks-eternitas.ts	2026-07-21 10:39:50.378003951 -0400
+@@ -35,6 +35,7 @@
+ import { Router, Request, Response } from 'express';
+ import crypto from 'crypto';
+ import { makeRateLimiter } from '../services/rate-limiter';
++import { applyEternitasPassportEvent } from '../services/eternitas-passport-events';
+ 
+ // ─── Recognized event types ──────────────────────────────────
+ //
+@@ -89,17 +90,29 @@
+ // Fired via setImmediate after the response is sent so the handler
+ // returns within the spec's 5s budget regardless of how long the
+ // downstream work takes.
+-export function processEternitasFirehoseEvent(event: Record<string, unknown>): void {
++export async function processEternitasFirehoseEvent(event: Record<string, unknown>): Promise<void> {
+     const type = String(event.type || event.event || '');
+     if (!KNOWN_EVENT_TYPES.has(type)) {
+         console.log(`[eternitas firehose] unknown event type: ${JSON.stringify(type)} (acknowledged, no handler)`);
+         return;
+     }
+-    // Phase 1 handler: log + no-op. Real handlers land as follow-up
+-    // commits in later waves (passport.revoked already has a local
+-    // cascade via /api/v1/identity/eternitas/webhook; we're careful
+-    // not to double-apply here).
+     console.log(`[eternitas firehose] ${type}`, JSON.stringify(event));
++
++    // Passport lifecycle events drive the LOCAL cascade (suspend/restore
++    // product accounts, revoke bot API keys, record trust). This used to
++    // be a log-only no-op while the sole cascade implementation sat in a
++    // legacy route whose signature could never verify — meaning revoked
++    // passports kept working locally. The cascade is idempotent, so
++    // Eternitas redeliveries are harmless.
++    const passportNumber = String(
++        event.passport_number || event.passport || event.passport_id || '',
++    );
++    if (passportNumber) {
++        const data = (event.data && typeof event.data === 'object')
++            ? (event.data as Record<string, unknown>)
++            : (event as Record<string, unknown>);
++        await applyEternitasPassportEvent(type, passportNumber, data);
++    }
+ }
+ 
+ // ─── Router ──────────────────────────────────────────────────
+@@ -159,11 +172,9 @@
+         // return within a few ms even if handlers take seconds.
+         res.status(200).json({ received: true });
+         setImmediate(() => {
+-            try {
+-                processEternitasFirehoseEvent(event);
+-            } catch (err: any) {
++            processEternitasFirehoseEvent(event).catch((err: any) => {
+                 console.error('[eternitas firehose] processing error:', err?.message || err);
+-            }
++            });
+         });
+     },
+ );
+--- /tmp/asm-pristine/src/routes/identity.ts	2026-07-21 10:39:01.821513393 -0400
++++ account-server-main/src/routes/identity.ts	2026-07-21 10:39:50.378003951 -0400
+@@ -1941,135 +1941,24 @@
+   }
+ });
+ 
+-// ─── POST /api/v1/identity/webhooks/eternitas — Platform-level webhook receiver ───
+-// This receives platform-level events from Eternitas after registration.
+-// Different from /eternitas/webhook which handles individual passport events.
+-
+-router.post('/webhooks/eternitas', (req: Request, res: Response) => {
+-  try {
+-    const { event, passport_number, timestamp, data } = req.body;
+-
+-    // P0 fix: signature verification is REQUIRED regardless of NODE_ENV.
+-    // See /eternitas/webhook above for the same pattern.
+-    const signature = req.headers['x-eternitas-signature'] as string | undefined;
+-    const webhookSecret = config.ETERNITAS_WEBHOOK_SECRET;
+-
+-    if (!webhookSecret) {
+-      return res.status(503).json({
+-        error: 'ETERNITAS_WEBHOOK_SECRET not configured on this server',
+-        code: 'webhook_secret_not_configured',
+-      });
+-    }
+-    if (typeof signature !== 'string' || !signature) {
+-      return res.status(401).json({ error: 'Missing X-Eternitas-Signature header' });
+-    }
+-    const expectedSig = crypto
+-      .createHmac('sha256', webhookSecret)
+-      .update(JSON.stringify(req.body))
+-      .digest('hex');
+-    const a = Buffer.from(signature);
+-    const b = Buffer.from(expectedSig);
+-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+-      return res.status(401).json({ error: 'Invalid signature' });
+-    }
+-    // P1-15 replay protection — mirror the ±5 min window from
+-    // /eternitas/webhook. An attacker who captured a valid signed
+-    // webhook could otherwise replay it indefinitely.
+-    if (timestamp !== undefined && timestamp !== null) {
+-      const ts = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
+-      const tsSec = typeof ts === 'number' && ts > 1e12 ? ts / 1000 : ts; // accept ms or s
+-      const ageSec = Math.abs(Date.now() / 1000 - tsSec);
+-      if (!Number.isFinite(ageSec) || ageSec > 300) {
+-        return res.status(401).json({ error: 'Webhook timestamp outside accepted window (±5 min)' });
+-      }
+-    }
+-
+-    if (!event || !passport_number) {
+-      return res.status(400).json({ error: 'event and passport_number are required' });
+-    }
+-
+-    const db = getDb();
+-
+-    switch (event) {
+-      case 'passport.revoked': {
+-        // Cascade revocation across all products
+-        cascadeRevocation(passport_number);
+-        console.log(`[Webhook] passport.revoked: ${passport_number}`);
+-        break;
+-      }
+-
+-      case 'passport.suspended': {
+-        // Similar to revoked but set status to 'suspended' instead of 'revoked'
+-        const passport = db.prepare(
+-          'SELECT identity_id FROM eternitas_passports WHERE passport_number = ?',
+-        ).get(passport_number) as { identity_id: string } | undefined;
+-
+-        if (passport) {
+-          db.prepare(
+-            "UPDATE product_accounts SET status = 'suspended' WHERE identity_id = ?",
+-          ).run(passport.identity_id);
+-          db.prepare(
+-            "UPDATE eternitas_passports SET status = 'suspended' WHERE passport_number = ?",
+-          ).run(passport_number);
+-          db.prepare(
+-            "UPDATE bot_api_keys SET status = 'revoked' WHERE identity_id = ?",
+-          ).run(passport.identity_id);
+-          logAuditEvent('passport_suspend', passport.identity_id, { event, passport_number });
+-        }
+-        console.log(`[Webhook] passport.suspended: ${passport_number}`);
+-        break;
+-      }
+-
+-      case 'passport.reinstated': {
+-        // Restore: reactivate product accounts, passport, and API keys
+-        const passport = db.prepare(
+-          'SELECT identity_id FROM eternitas_passports WHERE passport_number = ?',
+-        ).get(passport_number) as { identity_id: string } | undefined;
+-
+-        if (passport) {
+-          db.prepare(
+-            "UPDATE product_accounts SET status = 'active' WHERE identity_id = ?",
+-          ).run(passport.identity_id);
+-          db.prepare(
+-            "UPDATE eternitas_passports SET status = 'active' WHERE passport_number = ?",
+-          ).run(passport_number);
+-          db.prepare(
+-            "UPDATE bot_api_keys SET status = 'active' WHERE identity_id = ?",
+-          ).run(passport.identity_id);
+-          logAuditEvent('passport_reinstate', passport.identity_id, { event, passport_number });
+-        }
+-        console.log(`[Webhook] passport.reinstated: ${passport_number}`);
+-        break;
+-      }
+-
+-      case 'trust_updated': {
+-        const trustScore = data?.trust_score;
+-        if (typeof trustScore === 'number' && trustScore >= 0 && trustScore <= 1) {
+-          db.prepare(
+-            'UPDATE eternitas_passports SET trust_score = ? WHERE passport_number = ?',
+-          ).run(trustScore, passport_number);
+-
+-          const passport = db.prepare(
+-            'SELECT identity_id FROM eternitas_passports WHERE passport_number = ?',
+-          ).get(passport_number) as { identity_id: string } | undefined;
+-
+-          if (passport) {
+-            logAuditEvent('trust_updated', passport.identity_id, { passport_number, trustScore });
+-          }
+-        }
+-        console.log(`[Webhook] trust_updated: ${passport_number} -> ${data?.trust_score}`);
+-        break;
+-      }
+-
+-      default:
+-        console.log(`[Webhook] Unknown event: ${event} for ${passport_number}`);
+-    }
+-
+-    res.json({ received: true });
+-  } catch (err: any) {
+-    console.error('[Webhook] Eternitas platform webhook error:', err);
+-    res.status(500).json({ error: 'Webhook processing failed' });
+-  }
++// ─── POST /api/v1/identity/webhooks/eternitas — RETIRED (410) ───
++// This legacy platform-webhook receiver could NEVER verify a real
++// Eternitas signature: it HMAC'd JSON.stringify(req.body) (re-serialized
++// bytes) while Eternitas signs the raw wire bytes — a deterministic 401
++// for every delivery, forever. Eternitas's platform row was repointed to
++// the raw-body firehose route (POST /webhooks/eternitas, see
++// routes/webhooks-eternitas.ts) on 2026-07-06, and the local cascade it
++// contained now lives in services/eternitas-passport-events.ts, invoked
++// by that firehose. The route answers 410 (not 404) so any straggling
++// caller gets an explicit, diagnosable signal instead of a mystery.
++
++router.post('/webhooks/eternitas', (_req: Request, res: Response) => {
++  res.status(410).json({
++    error: 'gone',
++    detail:
++      'This endpoint is retired. Eternitas platform webhooks are received at ' +
++      'POST /webhooks/eternitas (raw-body HMAC). See routes/webhooks-eternitas.ts.',
++  });
+ });
+ 
+ // ─── GET /api/v1/identity/provisioning-status/:identity_id — Provisioning status ───
+--- /tmp/asm-pristine/tests/eternitas-webhook-signature.test.ts	2026-07-21 10:39:01.710078201 -0400
++++ account-server-main/tests/eternitas-webhook-signature.test.ts	2026-07-21 10:39:50.381003951 -0400
+@@ -82,61 +82,31 @@
+   });
+ });
+ 
+-describe('POST /api/v1/identity/webhooks/eternitas — signature enforcement', () => {
+-  it('rejects NO X-Eternitas-Signature header (401)', async () => {
+-    const res = await request(app)
+-      .post('/api/v1/identity/webhooks/eternitas')
+-      .send({ event: 'passport.revoked', passport_number: 'ET-ABCD1234', timestamp: Date.now() });
+-    expect(res.status).toBe(401);
+-    expect(res.body.error).toMatch(/Missing|signature/i);
+-  });
++describe('POST /api/v1/identity/webhooks/eternitas — RETIRED route', () => {
++  // This legacy platform-webhook receiver was retired 2026-07-21: its
++  // signature scheme (HMAC over re-serialized JSON) could never match
++  // Eternitas's raw-body signatures, so it 401'd every real delivery
++  // since birth. The live receiver is POST /webhooks/eternitas
++  // (raw-body; see tests/webhooks-eternitas.test.ts and
++  // tests/eternitas-cascade.test.ts). The route answers 410 for every
++  // request — signed, unsigned, or garbage — so stragglers get an
++  // explicit signal rather than an auth mystery.
+ 
+-  it('rejects WRONG header signature (401)', async () => {
+-    const body = { event: 'passport.revoked', passport_number: 'ET-ABCD1234', timestamp: Date.now() };
++  it('410 for unsigned requests', async () => {
+     const res = await request(app)
+       .post('/api/v1/identity/webhooks/eternitas')
+-      .set('X-Eternitas-Signature', 'deadbeef'.repeat(8))
+-      .send(body);
+-    expect(res.status).toBe(401);
++      .send({ event: 'passport.revoked', passport_number: 'ET-ABCD1234', timestamp: Date.now() });
++    expect(res.status).toBe(410);
++    expect(res.body.error).toBe('gone');
+   });
+ 
+-  it('accepts CORRECT header signature', async () => {
++  it('410 even for correctly-signed requests (route is gone, not guarded)', async () => {
+     const body = { event: 'passport.revoked', passport_number: 'ET-NOTFOUND', timestamp: Date.now() };
+     const res = await request(app)
+       .post('/api/v1/identity/webhooks/eternitas')
+       .set('X-Eternitas-Signature', signBody(body))
+       .send(body);
+-    expect(res.status).toBeLessThan(500);
+-    expect(res.status).not.toBe(401);
+-  });
+-
+-  it('P1-15: rejects a replayed timestamp >5 min old', async () => {
+-    const oldTs = Date.now() - 10 * 60 * 1000; // 10 min ago (ms)
+-    const body = { event: 'passport.revoked', passport_number: 'ET-NOTFOUND', timestamp: oldTs };
+-    const res = await request(app)
+-      .post('/api/v1/identity/webhooks/eternitas')
+-      .set('X-Eternitas-Signature', signBody(body))
+-      .send(body);
+-    expect(res.status).toBe(401);
+-    expect(res.body.error).toMatch(/window|timestamp/i);
+-  });
+-
+-  it('P1-15: accepts timestamp in seconds (not ms)', async () => {
+-    const nowSec = Math.floor(Date.now() / 1000);
+-    const body = { event: 'passport.revoked', passport_number: 'ET-NOTFOUND', timestamp: nowSec };
+-    const res = await request(app)
+-      .post('/api/v1/identity/webhooks/eternitas')
+-      .set('X-Eternitas-Signature', signBody(body))
+-      .send(body);
+-    expect(res.status).not.toBe(401);
+-  });
+-
+-  it('P1-15: webhook with NO timestamp still allowed (back-compat)', async () => {
+-    const body = { event: 'passport.revoked', passport_number: 'ET-NOTFOUND' };
+-    const res = await request(app)
+-      .post('/api/v1/identity/webhooks/eternitas')
+-      .set('X-Eternitas-Signature', signBody(body))
+-      .send(body);
+-    expect(res.status).not.toBe(401);
++    expect(res.status).toBe(410);
++    expect(String(res.body.detail)).toContain('/webhooks/eternitas');
+   });
+ });
