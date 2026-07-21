@@ -29,7 +29,7 @@ Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3
 | AWS zombie audit | ⬜ NEW — EC2s/RDS may still be billing Grant post-migration |
 
 ## PHASE 3 RANKED LIST (state: ⬜ not started unless noted)
-1. eternitas ⬜ · 2. windy-mind ⬜ · 3. windy-pro/account-server ⬜ · 4. windy-mail ⬜ · 5. windy-agent ⬜ · 6. windy-connect ⬜ · 7. windy-registry ⬜ · 8. windy-drops ⬜ · 9. windy-admin ⬜ → CONCERT PASS 1 ⬜
+1. eternitas ✅ (PRs #125/#126/#127 open — LAUNCH-READY on merge; CI box blocked-and-logged; follow-ups: PR-04 xfail→skip, deploy-prod retire, compose rename Grant-gated) · 2. windy-mind 🔄 (PR #73 CI-gate open; branch harden/mind-02-deploy-truth committed e8ac0b6, publishes via batch7; suite 483-pass/7.6s; remaining: silent-catch scan verdict = clean per recon, README check, principles pass) · 3. windy-pro/account-server ⬜ · 4. windy-mail ⬜ · 5. windy-agent ⬜ · 6. windy-connect ⬜ · 7. windy-registry ⬜ · 8. windy-drops ⬜ · 9. windy-admin ⬜ → CONCERT PASS 1 ⬜
 10. windy-chat ⬜ · 11. WindyCloud ⬜ · 12. windy-cloud-sites ⬜ · 13. windy-cloud-domains ⬜ · 14. windy-search ⬜ · 15. Windy-Clone ⬜ → CONCERT PASS 2 ⬜
 16. windytalk ⬜ · 17. windy-stt ⬜ · 18. windy-cell ⬜ · 19. windy-call ⬜ · 20. windy-text ⬜ · 21. windy-whatsapp-gateway ⬜ · 22. windy-code ⬜ · 23. windy-code-web ⬜ · 24. windy-pro-mobile ⬜ → CONCERT PASS 3 ⬜
 25. control-panel/word-mcp/fix-me ⬜ · 26. windy-calendar ⬜ · 27. windy-iron ⬜ · 28. windy-ads ⬜ (scope decision first) · 29. sites (each after its product) ⬜ → FINAL CONCERT PASS ⬜
