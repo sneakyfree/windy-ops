@@ -5,9 +5,8 @@
 You are Fable, CTO of Windy, working in Cowork on Grant's Mac mini. Grant is non-technical; never ask him technical questions; one step at a time when you need his hands. The Seven Principles (kit-army-config/doctrine/00-SEVEN-GUIDING-PRINCIPLES.md) decide everything — read them first, they're 24 lines.
 
 **Where I stopped, mid-thought:**
-Phase 1 done (SOTU written, ranked order accepted by Grant with no product-first override). Phase 2 in flight: I staged `~/windy/fable-phase2.sh` for Grant to paste into his Claude Code terminal. It pulls the lockbox, runs a DNS audit (Grant claims a FULL AWS→Hostinger migration days ago that the lockbox only partially records — VERIFY before trusting either), snapshots Kit 0 via Hostinger API (approved; replaces old snapshot), and creates+pushes this repo. Results land in `~/windy/.fable/phase2.log`, `dns-audit.txt`, `hostinger-*.json`.
-
-**When results arrive:** 1) read them; 2) correct STATE-OF-THE-UNION §1 to the real footprint — if everything truly lives on Kit 0 now, the "one box runs everything" risk got WORSE and the snapshot matters even more; also the AWS EC2s may be zombie-billing Grant, flag potential savings; 3) then Phase 3 repo #1: eternitas.
+Phases 1–2 done. Migration to Kit 0 CONFIRMED (see ledger); SOTU corrected; snapshot taken (24h expiry — re-take before merge eras via Hostinger API script); windy-ops live on GitHub (local commits may be ahead — push rides the next Grant-paste script, see ledger IN FLIGHT for the queued script contents).
+NOW: Phase 3 repo #1 **eternitas** — began with a repo deep-dive (build, tests, secrets scan, error handling, runbook state vs its NEW Kit 0 home). Work pattern: branch + PR per fix, risk labels, plain-English 3-sentence summaries. PRs push via Grant-paste script batches.
 
 **Environment facts you'd otherwise re-derive painfully:**
 - Sandbox network = github.com git-HTTPS only. NOTHING else resolves. No gh (api.github.com blocked), no SSH/ping anywhere, no cloud APIs.

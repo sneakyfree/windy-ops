@@ -3,7 +3,8 @@
 Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3): builds / tests+CI / no-secrets / error-handling / runbook / DNS-SSL / smoke-test / README / principles-pass.
 
 ## IN FLIGHT (right now)
-- **Phase 3 repo #1: eternitas** — starting 2026-07-21. NOTE: its deploy target is now Kit 0 (not AWS) — all deploy/runbook work must respect look-don't-touch + announce-first.
+- **Phase 3 repo #1: eternitas** — first PR ready: branch `harden/eternitas-01-silent-failures` (commit 84b7996, LOW risk, observability-only). Test run + push + PR-open ride batch3. Kit 0 inspection (for the deploy-truth runbook PR) also rides batch3. Sandbox CANNOT run eternitas tests (needs py3.12; blocked download) — Mac-side testing is the standing pattern for py3.12+ repos; sandbox CAN run pip/npm + ruff.
+- **DNS truths learned:** api.windymind/clone/drops/search/mail/call/cell/text + cloud.windycloud.com all → Kit 0. Legacy `windypro.thewindstorm.uk` = a Cloudflare TUNNEL (cfargotunnel) still fronting api.windyfly.ai, api.windychat.ai, api.windycode.org, push.windychat.ai, updates.windycode.org. SPAs on CF Pages (app.windyword/chat/mail). Stragglers: api.nachocrunch.org→3.85.96.56 (AWS, non-Windy), cloud.windyword.ai→32.193.70.195 (stale?). Hostinger WEEKLY auto-backups exist (07-13, 07-20) + my snapshot. NOTE: its deploy target is now Kit 0 (not AWS) — all deploy/runbook work must respect look-don't-touch + announce-first.
 - **Next terminal-script batch (queue for when Grant's hands are needed anyway):** Cloudflare API read-only DNS export (reveal proxied origins), Hostinger `GET /backups` (does Kit 0 have durable auto-backups beyond the 24h snapshot?), AWS zombie-instance audit, push pending windy-ops commits.
 
 ## PHASE 2 RESULTS (2026-07-21)
