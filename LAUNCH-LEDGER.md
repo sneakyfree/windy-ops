@@ -3,19 +3,20 @@
 Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3): builds / tests+CI / no-secrets / error-handling / runbook / DNS-SSL / smoke-test / README / principles-pass.
 
 ## IN FLIGHT (right now)
-- **Phase 2 foundations.** Waiting on Grant to run `~/windy/fable-phase2.sh` (one paste). It does: lockbox pull → DNS audit of all prod domains → Kit 0 snapshot (GET then CREATE) → windy-ops repo create+push. Results → `~/windy/.fable/`.
-- Next after script results: correct SOTU footprint (AWS→Hostinger reality), then token-hygiene flag list, then `.thewindstorm.uk` cleanup PRs (7 repos, mechanical), then Phase 3 repo #1 (eternitas).
+- **Phase 3 repo #1: eternitas** — starting 2026-07-21. NOTE: its deploy target is now Kit 0 (not AWS) — all deploy/runbook work must respect look-don't-touch + announce-first.
+- **Next terminal-script batch (queue for when Grant's hands are needed anyway):** Cloudflare API read-only DNS export (reveal proxied origins), Hostinger `GET /backups` (does Kit 0 have durable auto-backups beyond the 24h snapshot?), AWS zombie-instance audit, push pending windy-ops commits.
 
-## PHASE 2 QUEUE
+## PHASE 2 RESULTS (2026-07-21)
 | Item | State |
 |---|---|
-| GitHub billing | ⛔ BLOCKED — Grant has no funds now; negotiating credit with GitHub support. CI stays dead; manual runbooks standing |
-| Kit 0 snapshot | 🟡 approved, script staged |
-| DNS/migration audit | 🟡 script staged |
-| windy-ops repo | 🟡 approved, content seeded, script creates it |
-| Token hygiene flag-list | ⬜ (incl. Brave + PyPI from honesty note; degraded CF god token; dead GitHub PAT cloud-init residue — lockbox task #13) |
+| GitHub billing | ⛔ BLOCKED — no funds; Grant negotiating credit with GitHub support. CI dead; manual runbooks standing |
+| Kit 0 snapshot | ✅ taken 2026-07-21 04:36 UTC (id 309348, 30-min restore) — ⚠️ EXPIRES 24h later; there was NO prior snapshot. Re-take before every merge era; durable backup strategy still open |
+| DNS/migration audit | ✅ done — migration CONFIRMED (4 domains A→72.60.118.54, Kit 0 PTR=mail.windymail.ai; proxied origins pending CF read). fly.windyword.ai has NO DNS (Fly gateway homeless?); windyword.com points at a stranger (118.89.190.223) |
+| windy-ops repo | ✅ created private + pushed (root commit 4153a10) |
+| Token hygiene flag-list | ⬜ (Brave + PyPI honesty-note items; degraded CF god token; dead-PAT cloud-init residue — lockbox task #13) |
 | Mac mesh reboot-survival (LaunchDaemon) | ⬜ my call, low risk |
 | .thewindstorm.uk cleanup | ⬜ 7 PRs, table locked in lockbox |
+| AWS zombie audit | ⬜ NEW — EC2s/RDS may still be billing Grant post-migration |
 
 ## PHASE 3 RANKED LIST (state: ⬜ not started unless noted)
 1. eternitas ⬜ · 2. windy-mind ⬜ · 3. windy-pro/account-server ⬜ · 4. windy-mail ⬜ · 5. windy-agent ⬜ · 6. windy-connect ⬜ · 7. windy-registry ⬜ · 8. windy-drops ⬜ · 9. windy-admin ⬜ → CONCERT PASS 1 ⬜

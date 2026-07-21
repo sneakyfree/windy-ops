@@ -6,14 +6,12 @@
 
 ## 1. DEPLOYED FOOTPRINT (what is actually running)
 
+> **CORRECTED 2026-07-21 after live DNS audit.** Grant migrated production off AWS onto the Hostinger VPS (Kit 0) in mid-July. DNS proves it: `admin.windyword.ai`, `api.eternitas.ai`, `chat.windychat.ai`, and `mail.windymail.ai` all A-record **directly to 72.60.118.54**, and Kit 0's reverse-DNS is set to `mail.windymail.ai` (only done if mail sends from there). Most other prod domains are Cloudflare-proxied (origin hidden — presumed Kit 0, verify via Cloudflare API on next terminal run). The lockbox's AWS Wave-13 blocks are now HISTORY, not current state.
+
 | Where | What | Notes |
 |---|---|---|
-| **Kit 0** — Hostinger VPS `72.60.118.54` / `10.10.0.1` | OpenClaw gateway, Kit Mesh Messenger, WireGuard hub (20 peers) | PRODUCTION. Look, don't touch. Snapshot verification = Phase 2 item |
-| **AWS EC2 "mail box"** `54.88.113.79` (i-07cef803a6a3f86b4) | windy-mail (Stalwart), **eternitas** (api.eternitas.ai), **account-server** (account.windyword.ai), windy-clone API, windy-search | The single most load-bearing box in the ecosystem |
-| **AWS EC2 "mind box"** `35.173.154.119` | windy-mind (BYOM broker) | Manual-deploy runbook in lockbox (CI dead) |
-| **AWS EC2 "chat box"** (i-0f603361b88baa4c0) | windy-chat — Synapse + 4 microservices (chat.windychat.ai) | Push gateway live (APNs+FCM) |
-| **AWS EC2** | windy-cloud (cloud.windycloud.com) + RDS Postgres | Stripe sandbox keys loaded |
-| **AWS EC2** | windy-fly gateway (fly.windyword.ai) | Phase 5 of Wave 13 |
+| **Kit 0** — Hostinger VPS `72.60.118.54` / `10.10.0.1` (KVM 4: 4 vCPU / 16 GB / 200 GB, Ubuntu 24.04) | **Nearly everything**: OpenClaw gateway, KMM, WireGuard hub, + migrated prod services — mail (Stalwart), eternitas, account-server, chat (Synapse), admin, cloud kernel; likely clone/search/mind too (origin-verify pending) | PRODUCTION. Look, don't touch. **THE single point of failure for the whole ecosystem now.** Snapshot taken 2026-07-21 — but it EXPIRES in 24h (Hostinger keeps snapshots 1 day). Durable backup strategy = open Phase 2 item |
+| **AWS EC2 fleet** (mail/mind/chat/cloud boxes, RDS) | **Status unknown post-migration** — possibly still running and billing | ZOMBIE AUDIT NEEDED: if instances still run, Grant is paying for dead boxes. Also `fly.windyword.ai` has NO DNS anymore — Fly gateway's current home unknown |
 | **Cloudflare Pages** | most `*-site` marketing sites | Deploys manual via wrangler while CI is dead |
 | **Cloudflare R2** | Desktop release buckets (Windy Word, Windy Code) | Notarized artifacts uploaded 2026-05-22 |
 | **AWS S3+CloudFront** | windyword-site | Own IAM deploy user |
