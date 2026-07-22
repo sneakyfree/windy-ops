@@ -12,6 +12,9 @@ Since 2026-07-06 Eternitas dispatches platform webhooks to the raw-body firehose
 3. Legacy identity route → explicit **410 Gone** tombstone pointing at the firehose.
 4. Tests: new `tests/eternitas-cascade.test.ts` (6 cases incl. idempotent redelivery) + `tests/eternitas-webhook-signature.test.ts` repointed to assert 410. **42/42 webhook-family tests green; tsc clean** (run in the Mac-mini sandbox against main + current shared/contracts).
 
+## 🔴 NEW (2026-07-22, from cross-repo contract audit): missing `chat/account-deleted` route
+windy-chat calls `POST /api/v1/identity/chat/account-deleted` on Matrix-account teardown (windy-chat/services/onboarding/server.js:203, best-effort, only fires if WINDY_ACCOUNT_SERVER_URL is overridden from its localhost default). **account-server exposes no such route** (grep = 0 hits; identity.ts has chat/provision, chat/profile, mail/*, but not account-deleted) → the deletion webhook 404s silently. Consequence: when a user deletes their Chat/Matrix account, account-server never learns, so its side of the record can drift. Please EITHER add the route (mirror the other identity/chat/* handlers, X-Service-Token=CHAT_SERVICE_TOKEN auth) OR tell me the correct path and I'll repoint chat. This pairs with chat's own incomplete-GDPR-fan-out gap (chat deletes only onboarding-local rows; see windy-ops RECON.md §windy-chat). Right-to-erasure isn't complete until both sides cascade.
+
 ## Also noted while inside (verify against your consolidated tree)
 - `tests/api.test.ts` "translate/text returns 200 without auth" FAILS on pristine main in a clean environment (503) — likely env/provider-dependent or a dead-CI blind spot; not caused by the patch (fails without it).
 - `tests/landing-stub.test.ts` /index.html expects the built web dist — environmental unless the web bundle is present.

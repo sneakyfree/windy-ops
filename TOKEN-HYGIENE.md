@@ -23,6 +23,9 @@
 - **`kit_mesh` fleet private key** still exists only on Kit 0 + OC5, not in `secrets/`. Blocks key-based fleet SSH from this Mac (password fallback works).
 - **`windy-mac-key`** private half only on Windy 0 (scorecard item) — add to `secrets/mac-mini/` for consistency.
 
+## GIT-HISTORY SECRET SCAN (2026-07-22, night — done because repos are PUBLIC)
+Scanned all-refs history (first ~400 commits/repo) of the 9 core repos (eternitas, mind, mail, agent, connect, registry, drops, admin, chat) for real credential-value shapes (gh_/sk-/sk-ant-/re_/xox/AKIA/AIza/SG./PEM private-key blocks/JWTs). **RESULT: CLEAN — zero real leaked credentials.** Only intentional TEST FIXTURES matched: eternitas `tests/golden_vectors/cosign/es256_v1.json` field `private_key_pem_TEST_ONLY` (a fixed keypair for deterministic ES256 golden vectors — test-only by design), and windy-agent test strings (`detect_provider("sk-...")`, `test_sanitize_outgoing.py` dummy `sk-ant-...` that exists to verify the redactor). Both benign. NOTE: bounded to ~400 commits/repo — before any real public launch run a fuller deep scan (trufflehog/gitleaks) as part of the visibility gate. But the recent-history exposure from repos being public is LOW — good news for Grant.
+
 ## RESIDUE (documented, low risk, no action)
 - Dead GitHub PAT baked into old EC2 cloud-init user-data — moot if/when zombies terminated (see AWS audit).
 - Retired `windy-imac-key` persists in kit-army-config git history — accepted (history rewrite forbidden), access target no longer exists.
