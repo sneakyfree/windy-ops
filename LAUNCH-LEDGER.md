@@ -14,6 +14,11 @@ Grant (non-technical, doesn't want to review/merge) explicitly handed me review+
 - **MOBILE CLUSTER that must interop:** windy-pro-mobile + windy-chat(mobile) + windy-agent(mobile) + windy-talk(mobile) — Grant wants them tested together as one project eventually. Right now pro-mobile + talk are frozen, so I can only work agent + chat sides; audit their CONTRACTS toward the frozen ones without editing frozen repos.
 - **🚫 EXPANDED FREEZE — DO NOT TOUCH (sibling Fables on Windy 0 actively working):** **windy-talk (NEW — sibling working it live, steer around entirely)**; windy-pro / windy-word (sibling STRESS-TESTING across OC5 Intel Mac, THIS Mac mini, Grant-W Windows laptop, OC2/OC3 Linux — live test in progress); plus the standing Word freeze (windy-pro-mobile, windyword-site(s), windy-word-mcp, windy-fix-me). Coordinate via handoff notes (P6), never by editing their repos.
 
+## MORNING PROBE RESULT (2026-07-22, fable-morning.sh ran on Grant's Mac)
+- ✅ ALL 8 live services returned HTTP 200 (eternitas/mind/mail/registry/admin/account/connect/chat) — whole fleet up + healthy. Route lists captured (morning-routes.txt / openapi-*.json in .fable).
+- ⚠️ Kit 0 direct SSH FAILED (0 lines after password prompt). Ambiguous: either the lockbox root password drifted/rotated (prior session's SSH worked ~18h earlier with identical extraction) OR my expect step's 40s timeout was too tight for the 5×curl probe. BLOCKS the P1 mail deploy (needs Kit 0 SSH). Resolve with a tiny auth-only probe (15s) before any deploy. Flagged to Grant.
+- P2 registry integrity fix RE-SCOPED (see INTEGRATION-READINESS.md #2): NOT a one-liner — job targets a retired eternitas contract (integrity_band no longer an API field; clearance_level is operator-only). Staged w/ recommendation, not shipped (non-core, don't write guessed data).
+
 ## NIGHT-SHIFT SHIP LOG (2026-07-22, self-merged by Fable/CTO, all tested + verified on origin)
 - ✅ **windy-drops main = 2ab4691** — `harden/drops-01-fetch-timeouts`: bounded the 4 TS registry fetch calls (fetchDrop 15s/publish 30s/upload 120s/withdraw 30s) via new fetchWithTimeout; SDK suite 39/39 (35+4), codegen lint clean. Mirrors connect-01 + the Python side.
 - (connect-01 fetch-timeouts already merged earlier: main 86b4b51.)
