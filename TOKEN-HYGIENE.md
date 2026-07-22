@@ -19,7 +19,7 @@
 | 9 | NVIDIA NIM free-tier key | Traffic exceeds 1M tokens/day (rotate to paid) |
 
 ## AVAILABILITY GAPS (not rotation — missing/misplaced material)
-- **No live GitHub PAT exists anywhere** (old one dead 07-17, residue in a possibly-dead EC2's cloud-init). Consequence: Fable's sandbox cannot push/pull GitHub directly; everything rides Grant-paste scripts. A new fine-grained PAT (repo scope, sneakyfree) stored in the lockbox would restore agent autonomy. Needs Grant at github.com (~3 min) — queued as a morning ask, not urgent.
+- **GitHub PAT `fable-cowork-2026-07` — minted by Grant 2026-07-22 (in progress).** Standing location: `~/windy/.fable/gh-token` (0600, OUTSIDE all git repos — ~/windy itself is not a repo; delivered via drop.sh, value never in chat). Scope: fine-grained, sneakyfree all-repos, Contents+PRs read/write. Expires ~2026-10-20 — FLAG RENEWAL EARLY OCTOBER. Deviation from lockbox-as-SoT noted deliberately: Grant can't edit the lockbox himself and I may not write to it (read-only doctrine); this file documents the location so it stays discoverable. Restores: push/fetch/clone autonomy incl. windy-ops memory sync. Does NOT restore gh/API (api.github.com walled) — PR-open/merge remain Grant's clicks.
 - **`kit_mesh` fleet private key** still exists only on Kit 0 + OC5, not in `secrets/`. Blocks key-based fleet SSH from this Mac (password fallback works).
 - **`windy-mac-key`** private half only on Windy 0 (scorecard item) — add to `secrets/mac-mini/` for consistency.
 
