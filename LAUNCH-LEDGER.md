@@ -50,3 +50,6 @@ Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3
 
 ## BLOCKED-AND-LOGGED
 - CI green checkbox in EVERY repo checklist: blocked on GitHub billing (see Phase 2). Repos can complete all other boxes; CI box inherits unblock automatically when billing lands.
+
+## 🔴 LAUNCH-BLOCKING GATE (do not skip before any real public launch)
+- **Repo visibility.** As of 2026-07-22 the entire production ecosystem + windy-ops are PUBLIC on github.com/sneakyfree (only kit-army-config is private). Grant chose LEAVE-AS-IS for the pre-launch sandbox (his informed call) but agreed to revisit before launch. BEFORE inviting any outside user in: (1) decide final visibility per repo, (2) confirm the git-HISTORY secret sweep is complete for every repo that will stay public. The no-secrets checklist box now means HISTORY-clean, not just HEAD-clean.
