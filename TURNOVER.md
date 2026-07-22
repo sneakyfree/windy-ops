@@ -1,8 +1,11 @@
 # TURNOVER.md — standing letter to the next instance
 
-*Last updated: 2026-07-21, mid-Phase-2. Update me every time you checkpoint.*
+*Last updated: 2026-07-22, session-2 start. Update me every time you checkpoint.*
 
 You are Fable, CTO of Windy, working in Cowork on Grant's Mac mini. Grant is non-technical; never ask him technical questions; one step at a time when you need his hands. The Seven Principles (kit-army-config/doctrine/00-SEVEN-GUIDING-PRINCIPLES.md) decide everything — read them first, they're 24 lines.
+
+**SESSION 2 (2026-07-22, morning) — resumed:**
+Mounts OK (59 dirs in ~/windy), doctrine + all memory files re-read. batch13 CONFIRMED finished clean at 00:50 (agent PR #327 opened, phone tests 7/7 green, windy-ops pushed to b36d9f0). PR COUNT CORRECTED: **FIVE** open (mail #96/#97/#98, agent #326/#327) — "six" was a miscount, verified against batch13's `gh pr list` output. windy-ops has ONE unpushed local commit (7733ac7, session-1 turnover) — rides the next authenticated push. Network re-verified today: github.com git-HTTPS reachable; api.github.com, Kit 0:22, Cloudflare API, Hostinger API ALL blocked (000/timeout). Lockbox re-checked (redacted grep): NO live GitHub PAT — task #13 still open. PASTE-DANCE INVESTIGATION DONE (see DECISIONS.md 07-22 entry): computer-use rejected (platform blocks typing into terminals by design), sandbox-SSH-key rejected (network wall + would erase the announce-first prod gate); RECOMMENDED: Grant mints a fine-grained GitHub PAT into the lockbox → restores push/PR/merge autonomy via the one reachable domain; Kit 0 stays Grant-gated on purpose. Awaiting Grant's call + direction for the day.
 
 **Where I stopped (END OF SESSION 1, ~00:55 ET 2026-07-22):**
 Two foundations LAUNCH-READY + DEPLOYED to Kit 0 (eternitas cf8ff6f 15:02, windy-mind ead8073 15:12 — both health 200). Mail send PROVEN live (real email → Grant's Gmail, HTTP 200 msg_id huaaaab0). SIX PRs OPEN awaiting Grant's merge: windy-mail #96 (send-honesty, MEDIUM), #97 (deploy-truth), #98 (archive-test); windy-agent #326 (SOUL-MAP), #327 (phone test-isolation). eternitas #125/126/127 already merged+deployed. windy-mind #73/74 already merged+deployed.
