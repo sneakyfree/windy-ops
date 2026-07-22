@@ -2,6 +2,13 @@
 
 Update BEFORE starting any task and AFTER finishing. Checklist per repo (Phase 3): builds / tests+CI / no-secrets / error-handling / runbook / DNS-SSL / smoke-test / README / principles-pass.
 
+## 2026-07-22 — GRANT DELEGATED PR MERGE AUTHORITY TO FABLE (CTO)
+Grant (non-technical, doesn't want to review/merge) explicitly handed me review+merge decisions, to be made by the Seven Principles. My standing boundary (itself P1-derived) — I decide/do everything EXCEPT three classes, which still get one plain yes/no: (1) spending his money, (2) irreversible destruction, (3) flipping a change onto the LIVE app/Kit 0. **ALL SIX open PRs MERGED by me this session** (local git + PAT push, each merge verified landed on origin):
+- windy-mail main → **e7fd36d**: #96 no-fake-send (MEDIUM), #97 deploy-truth, #98 archive-test
+- windy-agent master → **f53a870**: #326 SOUL-MAP, #327 phone-test-isolation
+- windy-connect main → **86b4b51**: connect-01 fetch-timeouts
+⚠️ MERGED ≠ DEPLOYED: mail's honesty+deploy fixes are in main but the LIVE mail service on Kit 0 still runs old code until an announced deploy (a class-3 action → Grant yes/no when I propose it). Rollback for any merge = `git revert` (nothing deployed, fully reversible).
+
 ## IN FLIGHT (right now)
 - **MORNING 07-21:** overnight suite GREEN on branch-01 (784 passed / 34 xfail / 0 fail, 50min). batch4b running: fast suite on validate/stack-01-02 → pushes branches 01+02 → opens PRs 1+2 (stacked). Kit 0 fully mapped (kit0-inspect.txt: ~50 containers; PROD ETERNITAS RUNS AS COMPOSE PROJECT `eternitas-dev` — naming trap documented; nginx is the host proxy, NOT caddy; repos under /root/*). AWS: ZERO instances anywhere-yet-checked but $121.61 July spend — service breakdown + EIP/volume + other-region checks ride batch4b. Runbook draft staged (.fable/staged-eternitas-SUBSTRATE-KIT0.md) with TBCs needing one more read-only inspect (docker inspect compose labels + nginx sites) → then branch 3 (deploy-truth PR) publishes.
 - **(superseded) Phase 3 repo #1: eternitas** — first PR ready: branch `harden/eternitas-01-silent-failures` (commit 84b7996, LOW risk, observability-only). Test run + push + PR-open ride batch3b (batch3 hit 3 script bugs, all fixed: uv --extra dev, backtick-anchored password extraction, canonical AWS creds). NOTE: suite runs SLOW on the Mac (~1 test/several sec) — investigate (bcrypt rounds under test?) as a later eternitas PR. Kit 0 inspection (for the deploy-truth runbook PR) also rides batch3. Sandbox CANNOT run eternitas tests (needs py3.12; blocked download) — Mac-side testing is the standing pattern for py3.12+ repos; sandbox CAN run pip/npm + ruff.
