@@ -4,6 +4,12 @@
 
 You are Fable, CTO of Windy, working in Cowork on Grant's Mac mini. Grant is non-technical; never ask him technical questions; one step at a time when you need his hands. The Seven Principles (kit-army-config/doctrine/00-SEVEN-GUIDING-PRINCIPLES.md) decide everything — read them first, they're 24 lines.
 
+**Where I stopped (END OF SESSION 1, ~00:55 ET 2026-07-22):**
+Two foundations LAUNCH-READY + DEPLOYED to Kit 0 (eternitas cf8ff6f 15:02, windy-mind ead8073 15:12 — both health 200). Mail send PROVEN live (real email → Grant's Gmail, HTTP 200 msg_id huaaaab0). SIX PRs OPEN awaiting Grant's merge: windy-mail #96 (send-honesty, MEDIUM), #97 (deploy-truth), #98 (archive-test); windy-agent #326 (SOUL-MAP), #327 (phone test-isolation). eternitas #125/126/127 already merged+deployed. windy-mind #73/74 already merged+deployed.
+OPEN DECISIONS FOR GRANT: (1) PHONE-PURCHASE-PROPOSAL.md — guard live Twilio number purchase behind an opt-in flag (money-behavior change, needs his yes). (2) whether to enable computer-use OR install a sandbox-reachable SSH key to END the copy-paste workflow (see latest DECISIONS entry). (3) un-freeze account-server once the Windy 0 Fable finishes the book-launch↔main consolidation.
+NEXT REPO in ranked order: #6 windy-connect (onboarding kernel) — recon NOT yet done. Then #7 registry, #8 drops, #9 admin → CONCERT PASS 1.
+FROZEN: all Windy Word repos (windy-pro, windy-pro-mobile, windyword-site(s), windy-word-mcp, windy-fix-me) — sibling Fable consolidating. account-server trust-cascade fix waits in handoff-account-server-cascade.patch + HANDOFF-windy-pro-findings.md.
+
 **Where I stopped (updated 2026-07-21 ~11:00 ET):** ALL FIVE PRs MERGED (eternitas main=cf8ff6f: #125/126/127; windy-mind main=ead8073: #73/74 — Grant authorized the merges verbatim). Local mains synced. NEXT: (a) Kit 0 deploy of merged eternitas+mind — ANNOUNCED to Grant, awaiting his yes (expect-script pattern; fresh snapshot exists from 12:23 UTC; deploy = git reset to main + rebuild api container per each repo's SUBSTRATE.md runbook); (b) repo #4 windy-mail — verify "JMAP send fixed in code" live + fix the fake-message-id honesty bug (send.py ~594/634/747, see RECON.md). Windy Word repos FROZEN (sibling Fable consolidating on Windy 0; see HANDOFF-windy-pro-findings.md — trust-critical cascade patch waiting for them). Night-shift notes below are archaeology.
 
 **Where I stopped (end of night shift, ~02:00 ET 2026-07-21):**
